@@ -22,6 +22,6 @@ public class ExecutorServiceHandler<S, X extends Throwable> extends ExceptionHan
 
     @Override
     public void handle(S s) {
-        pool.submit(() -> s);
+        pool.submit(() -> super.handle(s));
     }
 }

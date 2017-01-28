@@ -9,7 +9,6 @@ import java.util.concurrent.Executors;
 import io.benny.transmogrifier.handler.ExecutorServiceHandler;
 import io.benny.transmogrifier.handler.Handler;
 import io.benny.transmogrifier.handler.PrintingHandler;
-import io.benny.transmogrifier.handler.ThreadedHandler;
 import io.benny.transmogrifier.handler.TransmogrifyHandler;
 
 /**

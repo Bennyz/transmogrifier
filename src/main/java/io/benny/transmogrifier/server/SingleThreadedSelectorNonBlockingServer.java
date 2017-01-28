@@ -38,7 +38,7 @@ public class SingleThreadedSelectorNonBlockingServer {
 
         Map<SocketChannel, Queue<ByteBuffer>> pendingData = new HashMap<>();
         Handler<SelectionKey, IOException> acceptHandler = new AcceptHandler(pendingData);
-        Handler<SelectionKey, IOException> readHandler = new ReadHandler();
+        Handler<SelectionKey, IOException> readHandler = new ReadHandler(pendingData);
         Handler<SelectionKey, IOException> writeHandler = new WriteHandler();
 
         while (true) {

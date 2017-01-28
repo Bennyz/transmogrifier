@@ -2,15 +2,21 @@ package io.benny.transmogrifier.server;
 
 import java.io.IOException;
 import java.net.InetSocketAddress;
+import java.nio.ByteBuffer;
 import java.nio.channels.SelectionKey;
 import java.nio.channels.Selector;
 import java.nio.channels.ServerSocketChannel;
 import java.nio.channels.SocketChannel;
+import java.util.HashMap;
 import java.util.Iterator;
+import java.util.Map;
+import java.util.Queue;
 import java.util.Set;
 
+import io.benny.transmogrifier.handler.AcceptHandler;
 import io.benny.transmogrifier.handler.ExceptionHandler;
 import io.benny.transmogrifier.handler.Handler;
+import io.benny.transmogrifier.handler.ReadHandler;
 import io.benny.transmogrifier.handler.TransmogrifierChannelHandler;
 
 /**
@@ -30,6 +36,11 @@ public class SingleThreadedSelectorNonBlockingServer {
                         new TransmogrifierChannelHandler()
                 );
 
+        Map<SocketChannel, Queue<ByteBuffer>> pendingData = new HashMap<>();
+        Handler<SelectionKey, IOException> acceptHandler = new AcceptHandler(pendingData);
+        Handler<SelectionKey, IOException> readHandler = new ReadHandler();
+        Handler<SelectionKey, IOException> writeHandler = new WriteHandler();
+
         while (true) {
             selector.select();
             Set<SelectionKey> selectionKeys = selector.selectedKeys();
@@ -40,11 +51,11 @@ public class SingleThreadedSelectorNonBlockingServer {
 
                 if (key.isValid()) {
                     if (key.isAcceptable()) {
-                        System.out.println("Accepted connection");
+                        acceptHandler.handle(key);
                     } else if (key.isReadable()) {
-                        System.out.println("Message received");
+                        readHandler.handle(key);
                     } else if (key.isWritable()) {
-                        System.out.println("Socket ready for writing");
+                        writeHandler.handle(key);
                     }
                 }
             }
